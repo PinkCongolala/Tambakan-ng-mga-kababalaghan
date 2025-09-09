@@ -1,0 +1,35 @@
+Sub MergeExcelFilesKeepFormatting()
+    Dim FolderPath As String
+    Dim Filename As String
+    Dim SourceWB As Workbook
+    Dim TargetWB As Workbook
+    Dim ws As Worksheet
+    Dim TargetWS As Worksheet
+    Dim LastRow As Long
+
+    Set TargetWB = ThisWorkbook
+    Set TargetWS = TargetWB.Sheets(1)
+
+
+    FolderPath = "C:\Users\rebodos.lee\OneDrive - Alveo Land Corp\ALVEO\Metric Update\CIS\2025\AUGUST\Officia\"
+    
+    Filename = Dir(FolderPath & "*.xlsx")
+
+    Application.ScreenUpdating = False
+    Do While Filename <> ""
+        If Filename <> ThisWorkbook.Name Then
+            Set SourceWB = Workbooks.Open(FolderPath & Filename)
+            For Each ws In SourceWB.Worksheets
+                ws.UsedRange.Copy
+                LastRow = TargetWS.Cells(TargetWS.Rows.Count, 1).End(xlUp).Row
+                If LastRow > 1 Or TargetWS.Cells(1, 1).Value <> "" Then LastRow = LastRow + 1
+                TargetWS.Cells(LastRow, 1).PasteSpecial Paste:=xlPasteAllUsingSourceTheme
+            Next ws
+            SourceWB.Close False
+        End If
+        Filename = Dir
+    Loop
+    Application.CutCopyMode = False
+    Application.ScreenUpdating = True
+    MsgBox "Merge complete!"
+End Sub
